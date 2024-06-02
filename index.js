@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 
 const userRouters = require("./routes/usersRoutes");
+const subscriptionRouters = require("./routes/subscriptionRoutes");
 
 const app = express();
 
@@ -22,6 +23,7 @@ const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}...`));
 
 app.use("/user", userRouters);
+app.use("/subscription", subscriptionRouters);
 
 
 app.use((err, req, res, next) => {

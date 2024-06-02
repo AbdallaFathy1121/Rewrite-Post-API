@@ -3,9 +3,9 @@ const dbUsersOperations = require('../db/dbUsersOperations');
 
 //API TO Add User
 module.exports.addUser = async (req, res) => {
-    const { name, email, token, picture, roleId } = req.body;
+    const {id, name, email, picture, roleId } = req.body;
     try {
-        await dbUsersOperations.addUser(name, email, token, picture, roleId).then(result =>{
+        await dbUsersOperations.addUser(id, name, email, picture, roleId).then(result =>{
             res.status(201).json(result);
         })
     } catch (err) {
@@ -29,7 +29,7 @@ module.exports.getByEmail = async (req, res) => {
 //API TO GET ByToken
 module.exports.getByToken = async (req, res) => {
     try {
-        const {token} = req.body;
+        const {token} = req.params;
         //Query to get User
         await dbUsersOperations.getUserByToken(token).then(result=>{
             res.status(200).json(result);
