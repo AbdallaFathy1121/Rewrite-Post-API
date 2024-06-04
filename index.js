@@ -1,23 +1,19 @@
 require("dotenv").config();
 const express = require("express");
-
+const cors = require('cors');
 const userRouters = require("./routes/usersRoutes");
 const subscriptionRouters = require("./routes/subscriptionRoutes");
 
 const app = express();
-
-//middleware to allow connection between front end and backend using the front end ip
-app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header(
-      "Access-Control-Allow-Headers",
-      "Origin, X-Requested-With, Content-Type, Accept"
-    );
-    res.header("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, OPTIONS");
-    next();
-});
-
 app.use(express.json());
+
+// Use CORS middleware
+app.use(cors());
+const corsOptions = {
+  origin: 'http://localhost:3000', // Allow requests from this origin
+  optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+};
+app.use(cors(corsOptions));
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}...`));
