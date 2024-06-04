@@ -1,13 +1,16 @@
 const { Router } = require("express");
 const usersController = require("../controllers/usersController");
+const jwtMiddleWares = require('../middlewares/jwt');
 
 const router = Router();
 
 //Get Routes
-router.get("/all", usersController.getAll);
-router.get("/:email", usersController.getByEmail);
-router.get("/token/:token", usersController.getByToken);
-router.post("/add", usersController.addUser);
-router.post("/update", usersController.UpdateUserSubscriptionIdById);
+router.get("/all", jwtMiddleWares.authenticateJWT, usersController.getAll);
+router.get("/:email", jwtMiddleWares.authenticateJWT, usersController.getByEmail);
+
+// Post Routes
+router.post("/add", jwtMiddleWares.authenticateJWT, usersController.addUser);
+router.post("/update", jwtMiddleWares.authenticateJWT, usersController.UpdateUserSubscriptionIdById);
+router.post("/login", usersController.login);
 
 module.exports = router;
