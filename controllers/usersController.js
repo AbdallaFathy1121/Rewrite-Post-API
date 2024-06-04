@@ -1,4 +1,6 @@
 const dbUsersOperations = require('../db/dbUsersOperations');
+require("dotenv").config();
+const jwt = require('jsonwebtoken');
 
 
 //API TO Add User
@@ -50,16 +52,31 @@ module.exports.getAll = async (req, res) => {
     }
 };
 
-
-//API TO GET ByToken
-module.exports.getByToken = async (req, res) => {
+//API TO GET All Users
+module.exports.login = async (req, res) => {
+    const {email} = req.body;
     try {
-        const {token} = req.params;
-        //Query to get User
-        await dbUsersOperations.getUserByToken(token).then(result=>{
-            res.status(200).json(result);
+        // Get User By Email
+        let user;
+        await dbUsersOperations.getUserByEmail(email).then(result => {
+            user = result.data;
         })
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid Email' });
+        }
+            
+        // Create a JWT token
+        const token = jwt.sign(
+            { id: user.id, email: user.email, name: user.name, picture: user.picture, roleId: user.roleId, roleName: user.roleName }, 
+            process.env.SECRET_KEY, 
+            { expiresIn: '7d' }
+        );
+
+        return res.status(201).json({ token });
+
     } catch (err) {
         res.status(404).send(err.message);
     }
 };
+
