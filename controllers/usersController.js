@@ -1,6 +1,7 @@
 const dbUsersOperations = require('../db/dbUsersOperations');
 require("dotenv").config();
 const jwt = require('jsonwebtoken');
+const calculateExpirationDate = require('../helpers/calculateExpirationDate');
 
 
 //API TO Add User
@@ -52,6 +53,8 @@ module.exports.getAll = async (req, res) => {
     }
 };
 
+
+
 //API TO GET All Users
 module.exports.login = async (req, res) => {
     const {email} = req.body;
@@ -65,15 +68,24 @@ module.exports.login = async (req, res) => {
         if (!user) {
             return res.status(400).json({ message: 'Invalid Email' });
         }
+
+        const payload = { id: user.id, email: user.email, name: user.name, picture: user.picture, roleId: user.roleId, roleName: user.roleName };
+        const expiresIn = '7d';
             
         // Create a JWT token
         const token = jwt.sign(
-            { id: user.id, email: user.email, name: user.name, picture: user.picture, roleId: user.roleId, roleName: user.roleName }, 
+            payload, 
             process.env.SECRET_KEY, 
-            { expiresIn: '7d' }
+            { expiresIn }
         );
 
-        return res.status(201).json({ token });
+        // Calculate the expiration date
+        const expirationDate = calculateExpirationDate.calculateExpirationDate(expiresIn);
+
+        return res.status(201).json( {
+            token: token,
+            expiresAt: expirationDate
+        });
 
     } catch (err) {
         res.status(404).send(err.message);
