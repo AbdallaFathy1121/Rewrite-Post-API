@@ -1,6 +1,8 @@
 
 const config = require('./dbconfig');
 const sql = require('mssql');
+const jwt = require('jsonwebtoken');
+
 
 async function addUser(id, name, email, picture, roleId){
     try{
@@ -107,45 +109,6 @@ async function getAllUsers(){
     }
 }
 
-async function getUserByToken(token){
-    try{
-        let pool = await sql.connect(config);
-        let user = await pool.request()
-        .input("input_token", sql.NVarChar, token)
-        .query('Select u.name, u.email, u.roleId, u.picture from users u where u.token = @input_token');
-
-        // Response
-        const model = user.recordsets[0][0];
-        let result;
-        if (model != null) {
-            result = {
-                isSuccess: true,
-                errors: [],
-                message: "",
-                data: {
-                    name: model.name,
-                    email: model.email,
-                    picture: model.picture,
-                    roleId: model.roleId
-                }
-            };
-        }
-        else {
-            result = {
-                isSuccess: false,
-                errors: [],
-                message: "لا يوجد مستخدم",
-                data: {}
-            };
-        }
-
-        return result;
-    }
-    catch(error){
-        console.log(error);
-        throw error;
-    }
-}
 
 async function UpdateUserSubscriptionIdByUserId(userId, userSubscriptionId){
     try{
@@ -170,7 +133,6 @@ async function UpdateUserSubscriptionIdByUserId(userId, userSubscriptionId){
 module.exports = {
     addUser : addUser,
     getUserByEmail: getUserByEmail,
-    getUserByToken: getUserByToken,
     UpdateUserSubscriptionIdByUserId: UpdateUserSubscriptionIdByUserId,
     getAllUsers: getAllUsers
 }
