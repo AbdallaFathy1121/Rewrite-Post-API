@@ -12,9 +12,43 @@ module.exports.getSubscriptionById = async (req, res) => {
     }
 };
 
+//API TO Update UserSubscription By Id
+module.exports.updateUserSubscriptionById = async (req, res) => {
+    const { id, status, days } = req.body;
+    try {
+        await dbUserSubscriptionOperations.updateUserSubscriptionById(id, status, days).then(result =>{
+            res.status(200).json(result);
+        })
+    } catch (err) {
+        res.status(404).send(err.message);
+    }
+};
+
+//API TO Get All Subscriptions 
+module.exports.getAllSubscriptions = async (req, res) => {
+    try {
+        await dbUserSubscriptionOperations.getAllSubscriptions().then(result =>{
+            res.status(200).json(result);
+        })
+    } catch (err) {
+        res.status(404).send(err.message);
+    }
+};
+
+//API TO Get All UserSubscriptions 
+module.exports.getAllUserSubscriptions = async (req, res) => {
+    try {
+        await dbUserSubscriptionOperations.getAllUserSubscriptions().then(result =>{
+            res.status(200).json(result);
+        })
+    } catch (err) {
+        res.status(404).send(err.message);
+    }
+};
+
 //API TO Add User
 module.exports.assignUserIntoUserSubscription = async (req, res) => {
-    const { userId, subscriptionId } = req.body;
+    const { userId, subscriptionId, phoneNumber } = req.body;
     let subscription;
     await dbUserSubscriptionOperations.getSubscriptionById(subscriptionId).then(result =>{
         subscription = result.data;
@@ -26,7 +60,7 @@ module.exports.assignUserIntoUserSubscription = async (req, res) => {
     }
 
     try {
-        await dbUserSubscriptionOperations.assignIntoUserSubscription(userId, subscriptionId, subscription.days, subscription.postCredits, isFree).then(result =>{
+        await dbUserSubscriptionOperations.assignIntoUserSubscription(userId, subscriptionId, subscription.days, subscription.postCredits, isFree, phoneNumber).then(result =>{
             res.status(201).json(result);
         })
     } catch (err) {
