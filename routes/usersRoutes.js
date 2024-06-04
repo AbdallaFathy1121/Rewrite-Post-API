@@ -9,8 +9,8 @@ router.get("/all", jwtMiddleWares.authenticateJWT, usersController.getAll);
 router.get("/:email", jwtMiddleWares.authenticateJWT, usersController.getByEmail);
 
 // Post Routes
-router.post("/add", jwtMiddleWares.authenticateJWT, usersController.addUser);
-router.post("/update", jwtMiddleWares.authenticateJWT, usersController.UpdateUserSubscriptionIdById);
+router.post("/add", usersController.addUser);
+router.post("/update", usersController.UpdateUserSubscriptionIdById);
 router.post("/login", usersController.login);
 
 module.exports = router;
