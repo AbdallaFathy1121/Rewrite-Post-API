@@ -38,7 +38,7 @@ async function getUserByEmail(email){
         let pool = await sql.connect(config);
         let user = await pool.request()
         .input("input_email", sql.NVarChar, email)
-        .query('Select u.id, u.name, u.email, u.roleId, u.picture from users u where u.email = @input_email');
+        .query('Select u.id, u.name, u.email, u.roleId, u.picture, r.RoleName as roleName from users u left join Roles r on r.Id = u.RoleId where u.email = @input_email');
 
         // Response
         const model = user.recordsets[0][0];
@@ -53,7 +53,8 @@ async function getUserByEmail(email){
                     name: model.name,
                     email: model.email,
                     picture: model.picture,
-                    roleId: model.roleId
+                    roleId: model.roleId,
+                    roleName: model.roleName
                 }
             };
         }
@@ -62,6 +63,39 @@ async function getUserByEmail(email){
                 isSuccess: false,
                 errors: [],
                 message: "لا يوجد مستخد بهذا البريد الالكترونى",
+                data: {}
+            };
+        }
+        return result;
+    }
+    catch(error){
+        console.log(error);
+        throw error;
+    }
+}
+
+async function getAllUsers(){
+    try{
+        let pool = await sql.connect(config);
+        let user = await pool.request()
+        .query('Select u.id, u.name, u.email, u.roleId, u.picture, r.RoleName as roleName from users u left join Roles r on r.Id = u.RoleId');
+
+        // Response
+        const model = user.recordsets[0];
+        let result;
+        if (model != null) {
+            result = {
+                isSuccess: true,
+                errors: [],
+                message: "",
+                data: model
+            };
+        }
+        else {
+            result = {
+                isSuccess: false,
+                errors: [],
+                message: "لا يوجد يوجد مستخدمين",
                 data: {}
             };
         }
@@ -113,8 +147,30 @@ async function getUserByToken(token){
     }
 }
 
+async function UpdateUserSubscriptionIdByUserId(userId, userSubscriptionId){
+    try{
+        let pool = await sql.connect(config);
+        let user = await pool.request()
+        .query(`UPDATE users SET userSubscriptionsId = ${userSubscriptionId} WHERE id = ${userId}`);
+
+        const result = {
+            isSuccess: true,
+            errors: [],
+            message: "تم التعديل بنجاح",
+            data: {}
+        };
+
+        return result;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
 module.exports = {
     addUser : addUser,
     getUserByEmail: getUserByEmail,
-    getUserByToken: getUserByToken
+    getUserByToken: getUserByToken,
+    UpdateUserSubscriptionIdByUserId: UpdateUserSubscriptionIdByUserId,
+    getAllUsers: getAllUsers
 }
