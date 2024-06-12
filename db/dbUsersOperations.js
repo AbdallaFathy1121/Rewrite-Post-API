@@ -40,7 +40,7 @@ async function getUserByEmail(email){
         let pool = await sql.connect(config);
         let user = await pool.request()
         .input("input_email", sql.NVarChar, email)
-        .query('Select u.id, u.name, u.email, u.roleId, u.picture, r.RoleName as roleName from users u left join Roles r on r.Id = u.RoleId where u.email = @input_email');
+        .query('Select u.id, u.name, u.email, u.roleId, u.picture, r.RoleName as roleName, u.UserSubscriptionsId as userSubscriptionId from users u left join Roles r on r.Id = u.RoleId where u.email = @input_email');
 
         // Response
         const model = user.recordsets[0][0];
@@ -56,7 +56,8 @@ async function getUserByEmail(email){
                     email: model.email,
                     picture: model.picture,
                     roleId: model.roleId,
-                    roleName: model.roleName
+                    roleName: model.roleName,
+                    userSubscriptionId: model.userSubscriptionId
                 }
             };
         }

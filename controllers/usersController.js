@@ -69,7 +69,7 @@ module.exports.login = async (req, res) => {
             return res.status(400).json({ message: 'Invalid Email' });
         }
 
-        const payload = { id: user.id, email: user.email, name: user.name, picture: user.picture, roleId: user.roleId, roleName: user.roleName };
+        const payload = { id: user.id, email: user.email, name: user.name, picture: user.picture, roleId: user.roleId, roleName: user.roleName, userSubscriptionId: user.userSubscriptionId};
         const expiresIn = '7d';
             
         // Create a JWT token
