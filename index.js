@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require('cors');
 const userRouters = require("./routes/usersRoutes");
 const subscriptionRouters = require("./routes/subscriptionRoutes");
+const postRouters = require("./routes/postRoutes");
 
 const app = express();
 app.use(express.json());
@@ -20,9 +21,10 @@ app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT
 
 app.use("/user", userRouters);
 app.use("/subscription", subscriptionRouters);
+app.use("/post", postRouters);
 
 
 app.use((err, req, res, next) => {
-    console.error("Global Error", { err }); // Log the error
-    res.status(500).json({ error: "Internal server error" }); // Send an error response
+  console.error("Global Error", { err }); // Log the error
+  res.status(500).json({ error: "Internal server error" }); // Send an error response
 });
