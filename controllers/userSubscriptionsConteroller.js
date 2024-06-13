@@ -12,6 +12,18 @@ module.exports.getSubscriptionById = async (req, res) => {
     }
 };
 
+//API TO Get User Subscription By Id
+module.exports.getUserSubscriptionById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        await dbUserSubscriptionOperations.getUserSubscriptionById(id).then(result =>{
+            res.status(200).json(result);
+        })
+    } catch (err) {
+        res.status(404).send(err.message);
+    }
+};
+
 //API TO Update UserSubscription By Id
 module.exports.updateUserSubscriptionById = async (req, res) => {
     const { id, status, days } = req.body;
@@ -23,6 +35,19 @@ module.exports.updateUserSubscriptionById = async (req, res) => {
         res.status(404).send(err.message);
     }
 };
+
+//API TO Update UserSubscription By Id
+module.exports.changeCreditsUserSubscription = async (req, res) => {
+    const { id, postCredits } = req.body;
+    try {
+        await dbUserSubscriptionOperations.changePostCreditsUserSubscriptionById(id, postCredits).then(result =>{
+            res.status(200).json(result);
+        })
+    } catch (err) {
+        res.status(404).send(err.message);
+    }
+};
+
 
 //API TO Get All Subscriptions 
 module.exports.getAllSubscriptions = async (req, res) => {

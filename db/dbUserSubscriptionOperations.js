@@ -74,6 +74,49 @@ async function getSubscriptionById(id) {
   }
 }
 
+// Function To Get User Subscription By Id
+async function getUserSubscriptionById(id) {
+  try {
+    let pool = await sql.connect(config);
+    let subscription = await pool
+      .request()
+      .input("input_id", sql.Int, id)
+      .query("Select * from UserSubscriptions s where s.id = @input_id");
+
+    // Response
+    const model = subscription.recordsets[0][0];
+    let result;
+    if (model != null) {
+      result = {
+        isSuccess: true,
+        errors: [],
+        message: "",
+        data: {
+          id: model.Id,
+          userId: model.UserId,
+          subscriptionId: model.SubscriptionId,
+          postCredits: model.PostCreditsRemaining,
+          status: model.Status,
+          startDate: model.StartDate,
+          endDate: model.EndDate,
+          phoneNumber: model.PhoneNumber
+        },
+      };
+    } else {
+      result = {
+        isSuccess: false,
+        errors: [],
+        message: "لا يوجد اشتراك",
+        data: {},
+      };
+    }
+    return result;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
 // Function To Get Update UserSubscription By Id
 async function updateUserSubscriptionById(id, status, days) {
   try {
@@ -87,8 +130,9 @@ async function updateUserSubscriptionById(id, status, days) {
       .request()
       .input("input_startDate", sql.DateTime, dateNow)
       .input("input_endDate", sql.DateTime, endDate)
+      .input("input_status", sql.NVarChar, status)
       .query(
-        `UPDATE userSubscriptions SET Status = ${status}, StartDate = @input_startDate, EndDate = @input_endDate WHERE Id = ${id}`
+        `UPDATE userSubscriptions SET Status = @input_status, StartDate = @input_startDate, EndDate = @input_endDate WHERE Id = ${id}`
       );
 
     let result = {
@@ -103,6 +147,31 @@ async function updateUserSubscriptionById(id, status, days) {
     throw error;
   }
 }
+
+// Function To Change PostCredits User Subscription By Id
+async function changePostCreditsUserSubscriptionById(id, postCredits) {
+  try {
+    let pool = await sql.connect(config);
+    let subscription = await pool
+      .request()
+      .input("input_postCredits", sql.Int, postCredits)
+      .query(
+        `UPDATE userSubscriptions SET PostCreditsRemaining = @input_postCredits WHERE Id = ${id}`
+      );
+
+    let result = {
+      isSuccess: true,
+      errors: [],
+      message: "تم التعديل بنجاح",
+      data: {},
+    };
+    return result;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
 
 // Function To Get All UserSubscriptions
 async function getAllUserSubscriptions() {
@@ -155,13 +224,18 @@ async function assignIntoUserSubscription(
     const endDate = new Date(dateNow);
     endDate.setDate(dateNow.getDate() + duration);
 
+    let status = "PENDDING";
+    if (isFree) {
+      status = "ACCEPTED";
+    }
+
     let pool = await sql.connect(config);
     let user = await pool
       .request()
       .input("input_userId", sql.NVarChar, userId)
       .input("input_subscriptionId", sql.Int, subscriptionId)
       .input("input_postCreditsRemaining", sql.Int, postCredits)
-      .input("input_status", sql.Bit, isFree)
+      .input("input_status", sql.NVarChar, status)
       .input("input_startDate", sql.DateTime, dateNow)
       .input("input_endDate", sql.DateTime, endDate)
       .input("input_phoneNumber", sql.NVarChar, phoneNumber)
@@ -188,4 +262,6 @@ module.exports = {
   getAllSubscriptions: getAllSubscriptions,
   getAllUserSubscriptions: getAllUserSubscriptions,
   updateUserSubscriptionById: updateUserSubscriptionById,
+  getUserSubscriptionById: getUserSubscriptionById,
+  changePostCreditsUserSubscriptionById: changePostCreditsUserSubscriptionById
 };
