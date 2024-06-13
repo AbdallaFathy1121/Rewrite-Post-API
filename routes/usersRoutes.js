@@ -6,7 +6,7 @@ const router = Router();
 
 //Get Routes
 router.get("/all", jwtMiddleWares.authenticateJWT, usersController.getAll);
-router.get("/:email", jwtMiddleWares.authenticateJWT, usersController.getByEmail);
+router.get("/:email", usersController.getByEmail);
 
 // Post Routes
 router.post("/add", usersController.addUser);
