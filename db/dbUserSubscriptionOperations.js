@@ -81,7 +81,7 @@ async function getUserSubscriptionById(id) {
     let subscription = await pool
       .request()
       .input("input_id", sql.Int, id)
-      .query("Select * from UserSubscriptions s where s.id = @input_id");
+      .query("Select us.Id, us.UserId, us.SubscriptionId, us.PostCreditsRemaining, us.Status, us.StartDate, us.EndDate, us.PhoneNumber, s.Days from UserSubscriptions us left join Subscriptions s on s.Id = us.SubscriptionId where us.id = @input_id");
 
     // Response
     const model = subscription.recordsets[0][0];
@@ -99,8 +99,43 @@ async function getUserSubscriptionById(id) {
           status: model.Status,
           startDate: model.StartDate,
           endDate: model.EndDate,
-          phoneNumber: model.PhoneNumber
+          phoneNumber: model.PhoneNumber,
+          days: model.Days
         },
+      };
+    } else {
+      result = {
+        isSuccess: false,
+        errors: [],
+        message: "لا يوجد اشتراك",
+        data: {},
+      };
+    }
+    return result;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+// Function To Get User Subscriptions By UserId
+async function getUserSubscriptionByUserId(userId) {
+  try {
+    let pool = await sql.connect(config);
+    let subscription = await pool
+      .request()
+      .input("input_userId", sql.NVarChar, userId)
+      .query("Select us.Id, us.UserId, s.Name, s.PostCredits, us.SubscriptionId, us.PostCreditsRemaining, us.Status, us.StartDate, us.EndDate, us.PhoneNumber, s.Days from UserSubscriptions us left join Subscriptions s on s.Id = us.SubscriptionId where us.UserId = @input_userId");
+
+    // Response
+    const model = subscription.recordsets[0];
+    let result;
+    if (model != null) {
+      result = {
+        isSuccess: true,
+        errors: [],
+        message: "",
+        data: model,
       };
     } else {
       result = {
@@ -179,7 +214,7 @@ async function getAllUserSubscriptions() {
     let pool = await sql.connect(config);
     
     let subscription = await pool.request().query(`
-        select us.Id, us.UserId, us.SubscriptionId, us.Status, us.PostCreditsRemaining, s.Days, us.StartDate, us.EndDate, u.picture, u.Name as UserName, s.Name as SubscriptionName, s.PostCredits, s.Price
+        select us.Id, us.UserId, u.Email as Email, us.SubscriptionId, us.Status, us.PostCreditsRemaining, s.Days, us.StartDate, us.EndDate, u.picture, u.Name as UserName, s.Name as SubscriptionName, s.PostCredits, s.Price, us.PhoneNumber
         from UserSubscriptions us
         left join users u on u.Id = us.UserId
         left join Subscriptions s on s.Id = us.SubscriptionId`);
@@ -263,5 +298,6 @@ module.exports = {
   getAllUserSubscriptions: getAllUserSubscriptions,
   updateUserSubscriptionById: updateUserSubscriptionById,
   getUserSubscriptionById: getUserSubscriptionById,
-  changePostCreditsUserSubscriptionById: changePostCreditsUserSubscriptionById
+  changePostCreditsUserSubscriptionById: changePostCreditsUserSubscriptionById,
+  getUserSubscriptionByUserId: getUserSubscriptionByUserId
 };

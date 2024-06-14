@@ -8,6 +8,7 @@ const router = Router();
 router.get("/all", jwtMiddleWares.authenticateJWT, userSubscriptionController.getAllSubscriptions);
 router.get("/allUserSubscriptions", jwtMiddleWares.authenticateJWT, userSubscriptionController.getAllUserSubscriptions);
 router.get("/userSubscription/:id", jwtMiddleWares.authenticateJWT, userSubscriptionController.getUserSubscriptionById);
+router.get("/userSubscriptionByUserId/:id", jwtMiddleWares.authenticateJWT, userSubscriptionController.getUserSubscriptionsByUserId);
 router.get("/:id", jwtMiddleWares.authenticateJWT, userSubscriptionController.getSubscriptionById);
 
 // Post Routes
