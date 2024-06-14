@@ -24,6 +24,19 @@ module.exports.getUserSubscriptionById = async (req, res) => {
     }
 };
 
+//API TO Get User Subscriptions By UserId
+module.exports.getUserSubscriptionsByUserId = async (req, res) => {
+    const { id } = req.params;
+    try {
+        await dbUserSubscriptionOperations.getUserSubscriptionByUserId(id).then(result =>{
+            res.status(200).json(result);
+        })
+    } catch (err) {
+        res.status(404).send(err.message);
+    }
+};
+
+
 //API TO Update UserSubscription By Id
 module.exports.updateUserSubscriptionById = async (req, res) => {
     const { id, status, days } = req.body;
@@ -71,7 +84,7 @@ module.exports.getAllUserSubscriptions = async (req, res) => {
     }
 };
 
-//API TO Add User
+//API TO Assign User Into User Subscription
 module.exports.assignUserIntoUserSubscription = async (req, res) => {
     const { userId, subscriptionId, phoneNumber } = req.body;
     let subscription;
